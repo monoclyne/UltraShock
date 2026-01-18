@@ -30,6 +30,7 @@ package: release
 
 .PHONY: install
 install: check build
+	mkdir -p $(BEPINEX_PLUGIN_DIR)
 	cp $(BUILT_DLL) $(BEPINEX_PLUGIN_DIR)
 
 .PHONY: check

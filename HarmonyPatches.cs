@@ -17,5 +17,6 @@ public class HurtPatch
 {
     static void Postfix(int damage, bool invincible, float scoreLossMultiplier, bool explosion, bool instablack, float hardDamageMultiplier, bool ignoreInvincibility) {
         UltraShockPlugin.Logger.LogInfo("Damage" + damage +"!");
+        UltraShockPlugin.Shocker.EnqueueShock(damage / 10, 500);
     }
 }

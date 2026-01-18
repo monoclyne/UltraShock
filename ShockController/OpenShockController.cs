@@ -8,6 +8,7 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using BepInEx.Logging;
 
 #nullable enable
 namespace ShockController;
@@ -19,14 +20,14 @@ public class OpenShockController : IShockController
     private readonly string _deviceId;
     private readonly string _apiKey;
     private readonly float _cooldownSeconds;
-    private readonly ILogger _logger;
+    private readonly ManualLogSource _logger;
     private readonly HttpClient _client = new HttpClient();
     private DateTime _lastShockTime = DateTime.MinValue;
 
     private TimeSpan ShockCooldown => TimeSpan.FromSeconds(1.0 + Math.Max(0.0f, _cooldownSeconds));
 
     public OpenShockController(string apiUrl, string deviceId, string apiKey, float cooldownSeconds,
-            ILogger logger)
+            ManualLogSource logger)
     {
         _apiUrl = apiUrl;
         _deviceId = deviceId;

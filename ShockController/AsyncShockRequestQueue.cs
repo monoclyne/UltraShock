@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using BepInEx.Logging;
 
 namespace ShockController
 {
@@ -18,9 +19,9 @@ namespace ShockController
         private Task _worker;
         private readonly object _lock = new();
         private bool _disposed;
-        private ILogger _logger;
+        private ManualLogSource _logger;
 
-        public ShockRequestQueue(ILogger logger)
+        public ShockRequestQueue(ManualLogSource logger)
         {
             _logger = logger;
             Start();

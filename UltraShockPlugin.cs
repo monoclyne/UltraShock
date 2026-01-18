@@ -13,6 +13,7 @@ public class UltraShockPlugin : BaseUnityPlugin {
     public static UltraShockPlugin Instance;
 
     internal ShockController.ShockConfig _shockConf;
+    public static ShockController.IShockController Shocker;
 
     private void Awake() {
         Instance = this;
@@ -31,6 +32,17 @@ public class UltraShockPlugin : BaseUnityPlugin {
 
         ConfigFile f = new ConfigFile($"BepInEx/config/{PluginInfo.PLUGIN_GUID}.cfg", saveOnInit: true);
         _shockConf = new ShockController.ShockConfig(f);
+
+        Logger.LogInfo($"Shock provider is: {_shockConf.ShockProviderType.Value}");
+        if (_shockConf.ShockProviderType.Value == ShockController.ShockConfig.ShockProvider.OpenShock) {
+            Shocker = new ShockController.OpenShockController(
+                apiUrl: _shockConf.OpenShockApiUrl.Value,
+                deviceId: _shockConf.OpenShockDeviceId.Value,
+                apiKey: _shockConf.OpenShockApiKey.Value,
+                cooldownSeconds: _shockConf.ShockCooldownSeconds.Value,
+                Logger
+            );
+        }
     }
 
     private void OnEnable() {

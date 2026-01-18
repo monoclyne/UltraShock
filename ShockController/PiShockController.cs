@@ -7,28 +7,49 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using BepInEx.Logging;
+
+#nullable enable
 
 namespace ShockController
 {
     public class PiShockController : IShockController
     {
         private readonly HttpClient _client = new HttpClient();
-        private readonly ShockRequestQueue _queue = new ShockRequestQueue();
+        private readonly ShockRequestQueue _queue;
+        private readonly ManualLogSource _logger;
+
+        private readonly string _userName;
+        private readonly string _shareCode;
+        private readonly string _apiKey;
+        private readonly float _cooldownSeconds;
 
         private DateTime _lastShockTime = DateTime.MinValue;
-        private TimeSpan ShockCooldown => TimeSpan.FromSeconds(1 + Math.Max(0, Plugin.ShockCooldownSeconds.Value)); // forced 1s minimum, plus user config
+        private TimeSpan ShockCooldown => TimeSpan.FromSeconds(0.1 + Math.Max(0.0f, _cooldownSeconds));
+
+        public PiShockController(string userName, string shareCode, string apiKey, float cooldownSeconds,
+                ManualLogSource logger)
+        {
+            _userName = userName;
+            _shareCode = shareCode;
+            _apiKey = apiKey;
+
+            _cooldownSeconds = cooldownSeconds;
+            _logger = logger;
+            _queue = new ShockRequestQueue(logger);
+        }
 
         public void TriggerShock(int intensity, int duration_ms = 1, string? shareCode = null)
         {
             var now = DateTime.UtcNow;
             if (now - _lastShockTime < ShockCooldown)
             {
-                Plugin.Log.LogInfo($"[PeakShock] Shock skipped due to cooldown.");
+                _logger.LogInfo($"Shock skipped due to cooldown.");
                 return;
             }
             _lastShockTime = now;
-            var code = shareCode ?? Plugin.PiShockShareCode.Value;
-            Plugin.Log.LogInfo($"[PeakShock] Enqueue shock: intensity={intensity}, duration={duration_ms}, code={code}");
+            var code = shareCode ?? _shareCode;
+            _logger.LogInfo($"Enqueue shock: intensity={intensity}, duration={duration_ms}, code={code}");
             _queue.Enqueue(() => TriggerShockInternal(intensity, duration_ms, code));
         }
 
@@ -39,15 +60,15 @@ namespace ShockController
 
         private async Task TriggerShockInternal(int intensity, int duration, string code)
         {
-            var user = Plugin.PiShockUserName.Value;
-            var key = Plugin.PiShockAPIKey.Value;
+            var user = _userName;
+            var key = _apiKey;
             duration /= 1000;
             if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(key) || string.IsNullOrEmpty(code))
             {
-                Plugin.Log.LogWarning($"[PeakShock] Would send shock (intensity={intensity}, duration={duration}, code={code}), but PiShock credentials are not set.");
+                _logger.LogWarning($"Would send shock (intensity={intensity}, duration={duration}, code={code}), but PiShock credentials are not set.");
                 return;
             }
-            Plugin.Log.LogInfo($"[PeakShock] Sending shock: intensity={intensity}, duration_sec={duration}, code={code}");
+            _logger.LogInfo($"Sending shock: intensity={intensity}, duration_sec={duration}, code={code}");
 
             var json = JsonConvert.SerializeObject(new
             {
@@ -62,16 +83,16 @@ namespace ShockController
 
             try
             { 
-                Plugin.Log.LogInfo($"[PeakShock] Sending request to PiShock API: {user}, Intensity={intensity}, Duration={duration}");
+                _logger.LogInfo($"Sending request to PiShock API: {user}, Intensity={intensity}, Duration={duration}");
                 var response = await _client.PostAsync("https://do.pishock.com/api/apioperate/", content);
                 if (!response.IsSuccessStatusCode)
                 {
-                    Plugin.Log.LogError($"PiShock API error: {response.StatusCode}");
+                    _logger.LogError($"PiShock API error: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
             {
-                Plugin.Log.LogError($"PiShock API exception: {ex}");
+                _logger.LogError($"PiShock API exception: {ex}");
             }
         }
     }

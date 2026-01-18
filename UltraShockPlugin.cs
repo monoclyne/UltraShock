@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using BepInEx.Configuration;
 using UnityEngine.SceneManagement;
 using HarmonyLib;
+using ShockController;
 
 namespace UltraShock;
 
@@ -12,8 +13,8 @@ public class UltraShockPlugin : BaseUnityPlugin {
     public static new ManualLogSource Logger;
     public static UltraShockPlugin Instance;
 
-    internal ShockController.ShockConfig _shockConf;
-    public static ShockController.IShockController Shocker;
+    internal ShockConfig _shockConf;
+    public static IShockController Shocker;
 
     public static ConfigEntry<int> ShockScale { get; private set; } = null!;
 
@@ -32,15 +33,24 @@ public class UltraShockPlugin : BaseUnityPlugin {
         var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(HurtPatch));
 
         ConfigFile f = new ConfigFile($"BepInEx/config/{PluginInfo.PLUGIN_GUID}.cfg", saveOnInit: true);
-        _shockConf = new ShockController.ShockConfig(f);
+        _shockConf = new ShockConfig(f);
         ShockScale = f.Bind("Shock", "ShockScale", 50, "How much to scale shock intensity (0-100)");
 
-        Logger.LogInfo($"Shock provider is: {_shockConf.ShockProviderType.Value}");
-        if (_shockConf.ShockProviderType.Value == ShockController.ShockConfig.ShockProvider.OpenShock) {
-            Shocker = new ShockController.OpenShockController(
+        var provider = _shockConf.ShockProviderType.Value;
+        Logger.LogInfo($"Shock provider is: {provider}");
+        if (provider == ShockConfig.ShockProvider.OpenShock) {
+            Shocker = new OpenShockController(
                 apiUrl: _shockConf.OpenShockApiUrl.Value,
                 deviceId: _shockConf.OpenShockDeviceId.Value,
                 apiKey: _shockConf.OpenShockApiKey.Value,
+                cooldownSeconds: _shockConf.ShockCooldownSeconds.Value,
+                Logger
+            );
+        } else if (provider == ShockConfig.ShockProvider.PiShock) {
+            Shocker = new PiShockController(
+                userName: _shockConf.PiShockUserName.Value,
+                shareCode: _shockConf.PiShockShareCode.Value,
+                apiKey: _shockConf.PiShockAPIKey.Value,
                 cooldownSeconds: _shockConf.ShockCooldownSeconds.Value,
                 Logger
             );

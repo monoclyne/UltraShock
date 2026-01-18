@@ -24,7 +24,7 @@ public class OpenShockController : IShockController
     private readonly HttpClient _client = new HttpClient();
     private DateTime _lastShockTime = DateTime.MinValue;
 
-    private TimeSpan ShockCooldown => TimeSpan.FromSeconds(1.0 + Math.Max(0.0f, _cooldownSeconds));
+    private TimeSpan ShockCooldown => TimeSpan.FromSeconds(0.1 + Math.Max(0.0f, _cooldownSeconds));
 
     public OpenShockController(string apiUrl, string deviceId, string apiKey, float cooldownSeconds,
             ManualLogSource logger)
@@ -42,7 +42,7 @@ public class OpenShockController : IShockController
         var utcNow = DateTime.UtcNow;
         if (utcNow - _lastShockTime < ShockCooldown)
         {
-            _logger.LogInfo("[PeakShock] OpenShock shock skipped due to cooldown.");
+            _logger.LogInfo("OpenShock shock skipped due to cooldown.");
             return;
         }
         _lastShockTime = utcNow;
@@ -55,16 +55,16 @@ public class OpenShockController : IShockController
         duration_ms = Math.Clamp(duration_ms, 300, 65535);
         if (string.IsNullOrEmpty(_apiUrl) || string.IsNullOrEmpty(_apiKey))
         {
-            _logger.LogWarning($"[PeakShock] Would send OpenShock (intensity={intensity}, duration_ms={duration_ms}), but OpenShock credentials are not set.");
+            _logger.LogWarning($"Would send OpenShock (intensity={intensity}, duration_ms={duration_ms}), but OpenShock credentials are not set.");
             return;
         }
         var id = !string.IsNullOrEmpty(code) ? code : _deviceId;
         if (string.IsNullOrEmpty(id))
         {
-            _logger.LogWarning("[PeakShock] No deviceId or share code provided for OpenShock.");
+            _logger.LogWarning("No deviceId or share code provided for OpenShock.");
             return;
         }
-        _logger.LogInfo($"[PeakShock] Sending OpenShock: id={id}, intensity={intensity}, duration_ms={duration_ms}");
+        _logger.LogInfo($"Sending OpenShock: id={id}, intensity={intensity}, duration_ms={duration_ms}");
         var data = new
         {
             Shocks = new[]
@@ -76,7 +76,7 @@ public class OpenShockController : IShockController
                     Duration = duration_ms
                 }
             },
-            CustomName = "Integrations.PeakShock"
+            CustomName = "Integrations.UltraShock"
         };
         var json = JsonConvert.SerializeObject(data);
         var content = new StringContent(json, Encoding.UTF8, "application/json");

@@ -41,6 +41,11 @@ This should create a file called `jakobbbb.UltraShock.cfg` within the
 First, find the line containing `Provider` and adapt it, depending on
 whether you use OpenShock or PiShock.
 
+You can also set a `ShockCooldownSeconds` value here, as well as
+`ShockScale` from 0-100 here.  If the scale is, for example, 50, and you
+receive 40 damage, you'll get a shock with an intensity of 20 (50% of
+40).
+
 Then, set the three options for your chosen provider.
 
 For **OpenShock**, these are below the `[OpenShock]` section heading.

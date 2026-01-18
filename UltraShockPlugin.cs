@@ -1,17 +1,37 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using UnityEngine.SceneManagement;
 
 namespace UltraShock;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-public class UltraShockPlugin : BaseUnityPlugin
-{
+public class UltraShockPlugin : BaseUnityPlugin {
+
     internal static new ManualLogSource Logger;
-        
-    private void Awake()
-    {
-        // Plugin startup logic
+    public static UltraShockPlugin Instance;
+
+    private void Awake() {
+        Instance = this;
+        DontDestroyOnLoad(this);
+
         Logger = base.Logger;
-        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded uwu!");
+        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded :3");
+
+        SceneManager.sceneLoaded += (_, _) =>
+        {
+            Logger.LogInfo("Scene loaded!");
+        };
+    }
+
+    private void OnEnable() {
+        Logger.LogInfo("Enabled");
+    }
+
+    private void OnDisable() {
+        Logger.LogInfo("Disabled");
+    }
+
+    private void Update() {
+        Logger.LogError("OWO");
     }
 }

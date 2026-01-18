@@ -3,7 +3,10 @@ UK_DIR ?= $(DEFAULT_UK_DIR)
 
 CONFIG ?= Debug
 
-BEPINEX_PLUGIN_DIR=$(UK_DIR)/BepInEx/plugins
+VERSION := $(shell jq -r ".version_number" < manifest.json)
+
+BUILT_DLL := ./bin/$(CONFIG)/netstandard2.1/UltraShock.dll
+BEPINEX_PLUGIN_DIR := $(UK_DIR)/BepInEx/plugins
 
 .PHONY: build
 build: check
@@ -13,9 +16,21 @@ build: check
 release: CONFIG := Release
 release: build
 
+.PHONY: package
+package: release
+	rm -fr /tmp/UltraShock
+	mkdir -p /tmp/UltraShock/plugins
+	cp $(BUILT_DLL) /tmp/UltraShock/plugins/jakobbbb.UltraShock.dll
+	cp manifest.json /tmp/UltraShock
+	cp README.md /tmp/UltraShock
+	cp LICENSE /tmp/UltraShock
+	cp icon.png /tmp/UltraShock
+	cd /tmp/UltraShock && zip -r UltraShock-$(VERSION).zip *
+	cp /tmp/UltraShock/*zip .
+
 .PHONY: install
 install: check build
-	cp ./bin/$(CONFIG)/netstandard2.1/UltraShock.dll $(BEPINEX_PLUGIN_DIR)
+	cp $(BUILT_DLL) $(BEPINEX_PLUGIN_DIR)
 
 .PHONY: check
 check:
@@ -25,6 +40,8 @@ check:
 		echo "Default is '$(DEFAULT_UK_DIR)'"; \
 		exit 1; \
 	fi
+	@grep -q "PLUGIN_VERSION = \"$(VERSION)\"" PluginInfo.cs || (echo "Version in PluginInfo.cs does not match manifest.json!" && exit 1)
+	@grep -q "<Version>$(VERSION)</Version>" UltraShock.csproj || (echo "Version in UltraShock.csproj does not match manifest.json!" && exit 1)
 
 .PHONY: clean
 clean:

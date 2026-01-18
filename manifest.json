@@ -1,0 +1,9 @@
+{
+    "name": "UltraShock",
+    "version_number": "0.0.1",
+    "website_url": "https://github.com/jakobbbb/UltraShock",
+    "description": "OpenShock/PiShock support for ULTRAKILL :3",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2304"
+    ]
+}

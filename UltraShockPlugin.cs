@@ -15,6 +15,8 @@ public class UltraShockPlugin : BaseUnityPlugin {
     internal ShockController.ShockConfig _shockConf;
     public static ShockController.IShockController Shocker;
 
+    public static ConfigEntry<int> ShockScale { get; private set; } = null!;
+
     private void Awake() {
         Instance = this;
         DontDestroyOnLoad(this);
@@ -27,11 +29,11 @@ public class UltraShockPlugin : BaseUnityPlugin {
             Logger.LogInfo("Scene loaded!");
         };
 
-        var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(CameraPatch));
-        harmony.PatchAll(typeof(HurtPatch));
+        var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(HurtPatch));
 
         ConfigFile f = new ConfigFile($"BepInEx/config/{PluginInfo.PLUGIN_GUID}.cfg", saveOnInit: true);
         _shockConf = new ShockController.ShockConfig(f);
+        ShockScale = f.Bind("Shock", "ShockScale", 50, "How much to scale shock intensity (0-100)");
 
         Logger.LogInfo($"Shock provider is: {_shockConf.ShockProviderType.Value}");
         if (_shockConf.ShockProviderType.Value == ShockController.ShockConfig.ShockProvider.OpenShock) {

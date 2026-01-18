@@ -24,6 +24,7 @@ public class UltraShockPlugin : BaseUnityPlugin {
         };
 
         var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(CameraPatch));
+        harmony.PatchAll(typeof(HurtPatch));
     }
 
     private void OnEnable() {

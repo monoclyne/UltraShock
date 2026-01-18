@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using UnityEngine.SceneManagement;
+using HarmonyLib;
 
 namespace UltraShock;
 
@@ -21,6 +22,8 @@ public class UltraShockPlugin : BaseUnityPlugin {
         {
             Logger.LogInfo("Scene loaded!");
         };
+
+        var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(CameraPatch));
     }
 
     private void OnEnable() {

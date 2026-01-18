@@ -6,7 +6,7 @@ using HarmonyLib;
 
 namespace UltraShock;
 
-[BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+[BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 public class UltraShockPlugin : BaseUnityPlugin {
 
     public static new ManualLogSource Logger;
@@ -19,7 +19,7 @@ public class UltraShockPlugin : BaseUnityPlugin {
         DontDestroyOnLoad(this);
 
         Logger = base.Logger;
-        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded :3");
+        Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded :3");
 
         SceneManager.sceneLoaded += (_, _) =>
         {
@@ -29,7 +29,7 @@ public class UltraShockPlugin : BaseUnityPlugin {
         var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(CameraPatch));
         harmony.PatchAll(typeof(HurtPatch));
 
-        ConfigFile f = new ConfigFile("BepInEx/config/UltraShock.cfg", saveOnInit: true);
+        ConfigFile f = new ConfigFile($"BepInEx/config/{PluginInfo.PLUGIN_GUID}.cfg", saveOnInit: true);
         _shockConf = new ShockController.ShockConfig(f);
     }
 

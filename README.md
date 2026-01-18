@@ -30,6 +30,12 @@ files, like this:
 └── winhttp.dll
 ```
 
+Note:  On **Linux** you may have to enter the following in ULTRAKILL's
+[launch options](https://help.steampowered.com/en/faqs/view/7D01-D2DD-D75E-2955):
+```
+WINEDLLOVERRIDES="winhttp=n,b" %command%
+```
+
 ## Configure
 
 Before you can configure UltraShock, you'll have to start and then close

@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using BepInEx.Configuration;
 using UnityEngine.SceneManagement;
 using HarmonyLib;
 
@@ -10,6 +11,8 @@ public class UltraShockPlugin : BaseUnityPlugin {
 
     public static new ManualLogSource Logger;
     public static UltraShockPlugin Instance;
+
+    internal ShockController.ShockConfig _shockConf;
 
     private void Awake() {
         Instance = this;
@@ -25,6 +28,9 @@ public class UltraShockPlugin : BaseUnityPlugin {
 
         var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(CameraPatch));
         harmony.PatchAll(typeof(HurtPatch));
+
+        ConfigFile f = new ConfigFile("BepInEx/config/UltraShock.cfg", saveOnInit: true);
+        _shockConf = new ShockController.ShockConfig(f);
     }
 
     private void OnEnable() {

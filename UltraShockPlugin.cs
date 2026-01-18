@@ -33,8 +33,8 @@ public class UltraShockPlugin : BaseUnityPlugin {
         var harmony = HarmonyLib.Harmony.CreateAndPatchAll(typeof(HurtPatch));
 
         ConfigFile f = new ConfigFile($"BepInEx/config/{PluginInfo.PLUGIN_GUID}.cfg", saveOnInit: true);
-        _shockConf = new ShockConfig(f);
         ShockScale = f.Bind("Shock", "ShockScale", 50, "How much to scale shock intensity (0-100)");
+        _shockConf = new ShockConfig(f);
 
         var provider = _shockConf.ShockProviderType.Value;
         Logger.LogInfo($"Shock provider is: {provider}");

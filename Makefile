@@ -7,7 +7,7 @@ BEPINEX_PLUGIN_DIR=$(UK_DIR)/BepInEx/plugins
 
 .PHONY: build
 build: check
-	dotnet build -c $(CONFIG)
+	UK_DIR=$(UK_DIR) dotnet build -c $(CONFIG)
 
 .PHONY: release
 release: CONFIG := Release
@@ -25,3 +25,8 @@ check:
 		echo "Default is '$(DEFAULT_UK_DIR)'"; \
 		exit 1; \
 	fi
+
+.PHONY: clean
+clean:
+	rm -fr ./bin
+	rm -fr ./obj

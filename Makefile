@@ -1,12 +1,11 @@
 DEFAULT_UK_DIR := $(HOME)/.local/share/Steam/steamapps/common/ULTRAKILL
 UK_DIR ?= $(DEFAULT_UK_DIR)
+BEPINEX_PLUGIN_DIR := $(UK_DIR)/BepInEx/plugins
 
 CONFIG ?= Debug
 
-VERSION := $(shell jq -r ".version_number" < manifest.json)
-
-BUILT_DLL := ./bin/$(CONFIG)/netstandard2.1/UltraShock.dll
-BEPINEX_PLUGIN_DIR := $(UK_DIR)/BepInEx/plugins
+VERSION = $(shell jq -r ".version_number" < manifest.json)
+BUILT_DLL = ./bin/$(CONFIG)/netstandard2.1/UltraShock.dll
 
 .PHONY: build
 build: check
@@ -17,6 +16,7 @@ release: CONFIG := Release
 release: build
 
 .PHONY: package
+package: CONFIG := Release
 package: release
 	rm -fr /tmp/UltraShock
 	mkdir -p /tmp/UltraShock/plugins

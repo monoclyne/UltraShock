@@ -4,6 +4,13 @@ An ULTRAKILL mod to add support for OpenShock and PiShock shock collars.
 
 Partially adapted from [PeakShock](https://github.com/addzeey/PeakShock/).
 
+> [!CAUTION]
+> Please
+> <a href="https://wiki.openshock.org/home/safety-rules/">read</a> up on
+> <a href="https://pishock.com/#/#safety-section">safety</a>.
+> This software is very much provided "as is", and I can't take
+> responsibility for what you do with it.
+
 ## Manual Install
 
 This mod depends on BepInEx 5, so please install that first.

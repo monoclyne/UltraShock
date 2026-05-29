@@ -110,3 +110,11 @@ To build a `.zip` for distribution via Thunderstore, run `make package`.
 ## Development (Windows)
 
 Install Ubuntu and WSL and then follow the Development (Linux) instructions. You may need to copy your ULTRAKILL file directory into a folder other than Program File (x86) due to that directory having spaces and parentheses, which don't work well with the build tool.
+
+## Planned Features
+
+- Round Robin mode
+- Random shocker mode
+- Optimization of asynchronous requests for multiple shockers
+- Support for ranged shock (randomization)
+- Specify ceil/floor/round (should 1 damage on 40% scale deal nothing or a 1% intensity shock?)

@@ -24,6 +24,7 @@ public class ShockConfig {
     public ConfigEntry<string> PiShockAPIKey { get; private set; } = null!;
     public ConfigEntry<string> PiShockShareCode { get; private set; } = null!;
     public ConfigEntry<string> PiShockShockerID { get; private set; } = null!;
+    public ConfigEntry<string> PiShockOpMode { get; private set; } = null!;
 
     public ShockConfig(ConfigFile f) {
 
@@ -39,5 +40,6 @@ public class ShockConfig {
         PiShockAPIKey = f.Bind("PiShock", "APIKey", "", "Your PiShock API Key");
         PiShockShareCode = f.Bind("PiShock", "ShareCode", "", "Your PiShock ShareCode");
         PiShockShockerID = f.Bind("PiShock", "ShockerID", "", "Your PiShock Shocker IDs. Comma separated list.");
+        PiShockOpMode = f.Bind("PiShock", "OpMode", "", "Opmode. 0 = Shock, 1 = Vibrate, 2 = Beep.");
     }
 }

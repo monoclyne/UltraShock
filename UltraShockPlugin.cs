@@ -51,6 +51,8 @@ public class UltraShockPlugin : BaseUnityPlugin {
                 userName: _shockConf.PiShockUserName.Value,
                 shareCode: _shockConf.PiShockShareCode.Value,
                 apiKey: _shockConf.PiShockAPIKey.Value,
+                shockerID: _shockConf.PiShockShockerID.Value,
+                opMode: _shockConf.PiShockOpMode.Value,
                 cooldownSeconds: _shockConf.ShockCooldownSeconds.Value,
                 Logger
             );

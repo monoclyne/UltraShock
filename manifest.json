@@ -1,8 +1,8 @@
 {
     "name": "UltraShock",
-    "version_number": "0.0.1",
-    "website_url": "https://github.com/jakobbbb/UltraShock",
-    "description": "OpenShock/PiShock support for ULTRAKILL :3",
+    "version_number": "0.0.2",
+    "website_url": "https://github.com/monoclyne/UltraShock",
+    "description": "OpenShock/PiShock support for ULTRAKILL",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2304"
     ]

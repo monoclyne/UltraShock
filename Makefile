@@ -20,7 +20,7 @@ package: CONFIG := Release
 package: release
 	rm -fr /tmp/UltraShock
 	mkdir -p /tmp/UltraShock/plugins
-	cp $(BUILT_DLL) /tmp/UltraShock/plugins/jakobbbb.UltraShock.dll
+	cp $(BUILT_DLL) /tmp/UltraShock/plugins/monoclyne.UltraShock.dll
 	cp manifest.json /tmp/UltraShock
 	cp README.md /tmp/UltraShock
 	cp LICENSE /tmp/UltraShock

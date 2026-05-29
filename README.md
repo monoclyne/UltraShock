@@ -3,6 +3,7 @@
 An ULTRAKILL mod to add support for OpenShock and PiShock shock collars.
 
 Partially adapted from [PeakShock](https://github.com/addzeey/PeakShock/).
+Patched from the original [UltraShock](https://github.com/jakobbbb/UltraShock) to work with the V3 PiShock API.
 
 > [!CAUTION]
 > Please
@@ -19,7 +20,7 @@ You can either use
 or directly get
 [BepInEx](https://github.com/BepInEx/BepInEx).
 
-Next, download and extract this mod's zip, and copy the `plugins`
+Next, download and extract this mod's zip (also contained within the source code), and copy the `plugins`
 directory into the `BepInEx` directory within the `ULTRAKILL` install.
 
 After installation your ULTRAKILL directory should look, among other
@@ -31,7 +32,7 @@ files, like this:
 │   │   ├── BepInEx.cfg
 │   ├── core
 │   └── plugins
-│       └── jakobbbb.UltraShock.dll
+│       └── monoclyne.UltraShock.dll
 ├── doorstop_config.ini
 ├── ULTRAKILL.exe
 └── winhttp.dll
@@ -48,7 +49,7 @@ WINEDLLOVERRIDES="winhttp=n,b" %command%
 Before you can configure UltraShock, you'll have to start and then close
 the game.
 
-This should create a file called `jakobbbb.UltraShock.cfg` within the
+This should create a file called `monoclyne.UltraShock.cfg` within the
 `BepInEx/config` directory.  Open it in your favorite text editor.
 
 First, find the line containing `Provider` and adapt it, depending on
@@ -80,8 +81,12 @@ DeviceId = bd4bae3e-155a-42cc-853f-9d404d670d3e
 ApiUrl = https://api.openshock.app
 ```
 
-For **PiShock**, set `APIKey`, `UserName` and `ShareCode` in a similar
-way.
+For **PiShock**, these are below the `[PiShock]` section heading.
+
+1. Paste your PiShock account username in the UserName section.
+2. Create an API token [here](https://login.pishock.com/account) and paste it, without quotes, in the `APIKey` line.
+3. Create a Share Code [here](https://pishock.com/#/control) (under SHARE) and paste it, without quotes, in the `ShareCode` line.
+4. Paste your PiShock shocker IDs in the ShockerID section. You may need to retrieve them; it is possible to retrieve these using the [Swagger interface](https://api.pishock.com/swagger/) if you don't recall them and can't easily access them.
 
 ## Development (Linux)
 
@@ -101,3 +106,7 @@ UK_DIR=/mnt/storage/Steam/steamapps/common/ULTRAKILL make install
 ```
 
 To build a `.zip` for distribution via Thunderstore, run `make package`.
+
+## Development (Windows)
+
+Install Ubuntu and WSL and then follow the Development (Linux) instructions. You may need to copy your ULTRAKILL file directory into a folder other than Program File (x86) due to that directory having spaces and parentheses, which don't work well with the build tool.

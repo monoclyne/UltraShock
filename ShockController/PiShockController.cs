@@ -1,5 +1,10 @@
-// This file was originally part of PeakShock, Copyright (c) 2025 Addzeey.
+// This file was adapted from part of PeakShock, Copyright (c) 2025 Addzeey.
 // Available at https://github.com/addzeey/PeakShock
+// Licensed under the MIT License.
+// See https://opensource.org/licenses/MIT for details.
+
+// This file was then part of ULTRASHOCK V3 patch, Copyright (c) 2026 Monoclyne.
+// Available at https://github.com/monoclyne/UltraShock
 // Licensed under the MIT License.
 // See https://opensource.org/licenses/MIT for details.
 
@@ -23,18 +28,20 @@ namespace ShockController
         private readonly string _shareCode;
         private readonly string _apiKey;
         private readonly string[] _shockerIDs;
+        private readonly string _opMode;
         private readonly float _cooldownSeconds;
 
         private DateTime _lastShockTime = DateTime.MinValue;
         private TimeSpan ShockCooldown => TimeSpan.FromSeconds(0.1 + Math.Max(0.0f, _cooldownSeconds));
 
-        public PiShockController(string userName, string shareCode, string apiKey, string shockerID, float cooldownSeconds,
+        public PiShockController(string userName, string shareCode, string apiKey, string shockerID, string opMode, float cooldownSeconds,
                 ManualLogSource logger)
         {
             _userName = userName;
             _shareCode = shareCode;
             _apiKey = apiKey;
             _shockerIDs = shockerID.Split(",");
+            _opMode = opMode;
 
             _cooldownSeconds = cooldownSeconds;
             _logger = logger;
@@ -115,7 +122,7 @@ namespace ShockController
                     Code = code,
                     Intensity = intensity,
                     Duration = duration,
-                    Operation = 1 // 0 = shock, 1 = vibrate (testing)
+                    Operation = (_opMode == "2")? 2: (_opMode == "1")? 1: 0  // 0 = shock, 1 = vibrate (testing)
                 });
                 var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
@@ -132,11 +139,11 @@ namespace ShockController
 
                 try
                 {
-                    _logger.LogInfo($"Sending request to PiShock API: {user}, Intensity={intensity}, Duration={duration}, ID={_shockerID}");
+                    _logger.LogInfo($"Sending request to PiShock API: {user}, Intensity={intensity}, Duration={duration}, ID={shockerID}");
                     var response = await _client.SendAsync(shockRequest);
                     if (!response.IsSuccessStatusCode)
                     {
-                        _logger.LogError($"PiShock API error: {response.StatusCode}");
+                         _logger.LogError($"PiShock API error: {response.StatusCode}");
                     }
                 }
                 catch (Exception ex)

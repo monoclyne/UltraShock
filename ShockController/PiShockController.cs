@@ -22,21 +22,24 @@ namespace ShockController
         private readonly string _userName;
         private readonly string _shareCode;
         private readonly string _apiKey;
+        private readonly string[] _shockerIDs;
         private readonly float _cooldownSeconds;
 
         private DateTime _lastShockTime = DateTime.MinValue;
         private TimeSpan ShockCooldown => TimeSpan.FromSeconds(0.1 + Math.Max(0.0f, _cooldownSeconds));
 
-        public PiShockController(string userName, string shareCode, string apiKey, float cooldownSeconds,
+        public PiShockController(string userName, string shareCode, string apiKey, string shockerID, float cooldownSeconds,
                 ManualLogSource logger)
         {
             _userName = userName;
             _shareCode = shareCode;
             _apiKey = apiKey;
+            _shockerIDs = shockerID.Split(",");
 
             _cooldownSeconds = cooldownSeconds;
             _logger = logger;
             _queue = new ShockRequestQueue(logger);
+            _queue.Enqueue(() => SetupSharecodeInternal(shareCode));
         }
 
         public void TriggerShock(int intensity, int duration_ms = 1, string? shareCode = null)
@@ -58,41 +61,88 @@ namespace ShockController
             TriggerShock(intensity, duration_ms, code);
         }
 
+        private async Task SetupSharecodeInternal(string code)
+        {
+            _logger.LogInfo("Attempting setup of sharecode.");
+            var json = JsonConvert.SerializeObject(new
+            {
+                Shares = new[] {
+                    code
+                }
+            });
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            HttpRequestMessage shareRequest = new HttpRequestMessage(
+                HttpMethod.Put,
+                "https://api.pishock.com/Share"
+            );
+
+            shareRequest.Headers.Add("X-PiShock-API-Key", _apiKey);
+            shareRequest.Headers.Add("X-PiShock-Username", _userName);
+
+            shareRequest.Content = content;
+
+            try
+            {
+                _logger.LogInfo($"Sending request to PiShock API: Share Code = {code}, Serialized Content = {content}");
+                var response = await _client.SendAsync(shareRequest);
+                _logger.LogInfo($"Recieved response {response}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"PiShock API exception: {ex}");
+            }
+        }
+
         private async Task TriggerShockInternal(int intensity, int duration, string code)
         {
             var user = _userName;
             var key = _apiKey;
-            duration /= 1000;
             if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(key) || string.IsNullOrEmpty(code))
             {
                 _logger.LogWarning($"Would send shock (intensity={intensity}, duration={duration}, code={code}), but PiShock credentials are not set.");
                 return;
             }
-            _logger.LogInfo($"Sending shock: intensity={intensity}, duration_sec={duration}, code={code}");
+            _logger.LogInfo($"Sending shock: intensity={intensity}, duration={duration}");
 
-            var json = JsonConvert.SerializeObject(new
+            foreach (string shockerID in _shockerIDs)
             {
-                Username = user,
-                APIKey = key,
-                Code = code,
-                Intensity = intensity,
-                Duration = duration,
-                Op = 0 // 0 = shock
-            });
-            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-            try
-            { 
-                _logger.LogInfo($"Sending request to PiShock API: {user}, Intensity={intensity}, Duration={duration}");
-                var response = await _client.PostAsync("https://do.pishock.com/api/apioperate/", content);
-                if (!response.IsSuccessStatusCode)
+                var json = JsonConvert.SerializeObject(new
                 {
-                    _logger.LogError($"PiShock API error: {response.StatusCode}");
+                    Username = user,
+                    APIKey = key,
+                    Code = code,
+                    Intensity = intensity,
+                    Duration = duration,
+                    Operation = 1 // 0 = shock, 1 = vibrate (testing)
+                });
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+
+                HttpRequestMessage shockRequest = new HttpRequestMessage(
+                    HttpMethod.Post,
+                    $"https://api.pishock.com/Shockers/{shockerID}"
+                );
+
+                shockRequest.Headers.Add("X-PiShock-API-Key", _apiKey);
+                shockRequest.Headers.Add("X-PiShock-Username", _userName);
+
+                shockRequest.Content = content;
+
+                try
+                {
+                    _logger.LogInfo($"Sending request to PiShock API: {user}, Intensity={intensity}, Duration={duration}, ID={_shockerID}");
+                    var response = await _client.SendAsync(shockRequest);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogError($"PiShock API error: {response.StatusCode}");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"PiShock API exception: {ex}");
+                catch (Exception ex)
+                {
+                    _logger.LogError($"PiShock API exception: {ex}");
+                }
             }
         }
     }
